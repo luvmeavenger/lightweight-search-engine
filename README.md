@@ -1,58 +1,36 @@
 # LightSearch
 
-A lightweight Rust search engine prototype built around a small local crawler and an inverted index.
-
-Features:
-- crawl a small set of seed URLs
-- normalize and index page content into SQLite
-- rank results using a lightweight TF-IDF style score
-- serve a simple web UI and a JSON search API
-- search from the terminal or browser
+A lightweight Rust search engine prototype with local crawling, SQLite indexing, relevance ranking, and basic anti-scam protections.
 
 ## Quick start
 
-1. Build the project:
-
 ```bash
 cargo build
-```
-
-2. Index a few seed pages:
-
-```bash
 cargo run -- index search.db seed_urls.txt
-```
-
-3. Run the browser UI:
-
-```bash
 cargo run -- serve 0.0.0.0:3000
 ```
 
-Then open http://localhost:3000 in a browser.
+Open <http://localhost:3000>, or run `cargo run -- search "rust"`.
 
-4. Or search from the command line:
+## Safety and abuse protection
 
-```bash
-cargo run -- search "rust"
-```
+The indexer now:
 
-## Project layout
+- accepts only HTTP/HTTPS URLs and limits requests to 10 seconds
+- sends a descriptive crawler user agent and indexes HTML only
+- detects common scam language, deceptive domains, IP-address URLs, unusually deep subdomains, and suspicious credential forms
+- blocks high-risk pages from normal results
+- keeps medium-risk pages discoverable but demotes them and adds a visible safety warning
+- stores risk scores and reasons in SQLite for later moderation and audit tools
 
-- `src/main.rs` - CLI and HTTP UI entry point
-- `src/search.rs` - crawling, indexing, ranking, and query logic
-- `seed_urls.txt` - sample websites to index
+These are heuristic defenses, not a replacement for a maintained threat-intelligence feed, malware scanner, Safe Browsing-style service, robots.txt handling, or human review. False positives are possible, so production deployments should provide reporting, appeals, and an allowlist.
 
-## Notes
+## Ecosystem policy
 
-- This is intentionally small and lightweight, not a production-scale Google clone.
-- It is designed to be extended with better ranking, scheduler, crawl frontier, and distributed search later.
-- It respects a simple model: crawl approved sites, store content locally, and rank results from an inverted index.
+Organic ranking is separate from user content and sponsored placement. Sponsored results must be clearly labeled and never silently alter organic ranking.
 
-## Roadmap
+## Layout
 
-- better ranking with BM25 and freshness
-- crawl queue with polite delays and robots.txt support
-- pagination and page ranking
-- user-generated content and sponsored results ecosystem
-- Docker deployment and performance tuning
+- `src/main.rs` - CLI, HTTP server, and UI
+- `src/search.rs` - crawling, safety assessment, indexing, ranking, and snippets
+- `seed_urls.txt` - sample sites
