@@ -18,118 +18,345 @@ const INDEX_HTML: &str = r#"
     <title>LightSearch</title>
     <style>
       :root {
-        --bg: #f5f7fb;
-        --card: #ffffff;
-        --text: #1e293b;
-        --muted: #64748b;
-        --line: #e2e8f0;
-        --accent: #2563eb;
-        --accent-soft: #dbeafe;
+        --bg: #07111f;
+        --panel: rgba(15, 23, 42, 0.75);
+        --panel-solid: #101b2d;
+        --card: #0f172a;
+        --card-soft: #111d33;
+        --line: rgba(148, 163, 184, 0.18);
+        --text: #e5eefb;
+        --muted: #9bb0cc;
+        --accent: #60a5fa;
+        --accent-strong: #3b82f6;
+        --success: #34d399;
+        --warning: #fbbf24;
+        --danger: #f87171;
+        --shadow: 0 18px 45px rgba(2, 6, 23, 0.45);
       }
+
       * { box-sizing: border-box; }
-      body {
+
+      html, body {
         margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-        background: var(--bg);
+        min-height: 100%;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+        background:
+          radial-gradient(circle at top, rgba(59,130,246,0.18), transparent 24%),
+          linear-gradient(180deg, #020817 0%, #07111f 32%, #091322 100%);
         color: var(--text);
       }
-      .wrap {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 40px 20px 60px;
-      }
-      .hero {
+
+      body {
         display: flex;
-        flex-direction: column;
+        justify-content: center;
+      }
+
+      .shell {
+        width: min(1100px, calc(100% - 32px));
+        padding: 28px 0 60px;
+      }
+
+      .topbar {
+        display: flex;
         align-items: center;
-        padding-top: 80px;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 30px;
       }
-      .logo {
-        font-size: 52px;
-        font-weight: 700;
-        letter-spacing: -0.06em;
-        margin-bottom: 20px;
-      }
-      .search-box {
-        width: min(100%, 720px);
+
+      .brand {
         display: flex;
+        align-items: center;
         gap: 10px;
-        background: var(--card);
+        font-weight: 700;
+        letter-spacing: -0.05em;
+        font-size: 1.25rem;
+      }
+
+      .brand-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--accent), #8b5cf6);
+        box-shadow: inset 0 0 18px rgba(255,255,255,0.18), 0 8px 18px rgba(96,165,250,0.38);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
         border: 1px solid var(--line);
+        background: rgba(15, 23, 42, 0.7);
+        color: var(--muted);
+        padding: 8px 12px;
         border-radius: 999px;
-        padding: 10px 14px 10px 18px;
-        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+        font-size: 0.9rem;
       }
-      input {
-        flex: 1;
-        border: none;
-        outline: none;
-        font-size: 18px;
-        background: transparent;
+
+      .chip.active {
+        background: rgba(96,165,250,0.12);
         color: var(--text);
+        border-color: rgba(96,165,250,0.34);
       }
+
+      .hero {
+        text-align: center;
+        padding: 36px 0 20px;
+      }
+
+      .title {
+        font-size: clamp(2.5rem, 5vw, 5rem);
+        margin: 0 0 10px;
+        letter-spacing: -0.07em;
+        font-weight: 800;
+      }
+
+      .subtitle {
+        margin: 0 auto 28px;
+        max-width: 620px;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+
+      .search-panel {
+        max-width: 820px;
+        margin: 0 auto;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--line);
+        border-radius: 25px;
+        padding: 12px 12px 12px 18px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(10px);
+      }
+
+      .search-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .search-row input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        outline: none;
+      }
+
+      .search-row input::placeholder {
+        color: #7f94b5;
+      }
+
       button {
         border: none;
-        background: var(--accent);
-        color: white;
-        padding: 12px 26px;
-        border-radius: 999px;
-        font-size: 16px;
-        font-weight: 600;
+        border-radius: 16px;
+        padding: 14px 22px;
+        font-size: 1rem;
+        font-weight: 700;
         cursor: pointer;
+        background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+        color: white;
+        box-shadow: 0 10px 20px rgba(59,130,246,0.35);
       }
+
+      .search-meta {
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 0.83rem;
+      }
+
+      .meta-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        box-shadow: 0 0 14px rgba(52, 211, 153, 0.7);
+      }
+
       .results {
-        margin-top: 32px;
+        margin-top: 26px;
         display: flex;
         flex-direction: column;
         gap: 18px;
       }
+
       .result {
-        background: var(--card);
+        background: rgba(15, 23, 42, 0.7);
         border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 18px 20px;
+        border-radius: 18px;
+        padding: 18px 18px 16px;
+        box-shadow: 0 10px 30px rgba(2,6,23,0.22);
       }
+
+      .result-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
       .result a {
-        color: var(--accent);
+        color: #dbeafe;
         text-decoration: none;
-        font-size: 18px;
-        font-weight: 600;
+        font-size: clamp(1.08rem, 2vw, 1.35rem);
+        font-weight: 700;
       }
-      .result a:hover { text-decoration: underline; }
-      .url {
+
+      .result a:hover {
+        text-decoration: underline;
+      }
+
+      .site {
         color: var(--muted);
-        font-size: 12px;
-        margin-top: 4px;
+        font-size: 0.8rem;
+        margin-top: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
+
+      .badge {
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .badge.safe {
+        background: rgba(52, 211, 153, 0.12);
+        color: #b9f3d8;
+      }
+
+      .badge.warning {
+        background: rgba(251, 191, 36, 0.12);
+        color: #fdd98a;
+      }
+
       .snippet {
-        margin-top: 8px;
-        color: var(--text);
-        line-height: 1.5;
-      }
-      .empty {
+        margin-top: 12px;
+        line-height: 1.7;
         color: var(--muted);
+      }
+
+      .warning {
+        margin-top: 10px;
+        border-left: 3px solid var(--warning);
+        padding-left: 12px;
+        color: #fdd98a;
+        background: rgba(251,191,36,0.04);
+        border-radius: 10px;
+        line-height: 1.45;
+      }
+
+      .empty,
+      .loading {
         text-align: center;
-        padding-top: 12px;
+        color: var(--muted);
+        padding: 26px 10px 10px;
+      }
+
+      @media (max-width: 640px) {
+        .topbar {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .search-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        button {
+          width: 100%;
+        }
       }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <div class="hero">
-        <div class="logo">LightSearch</div>
-        <form id="search-form" class="search-box">
-          <input id="query" type="text" placeholder="Search the web" autocomplete="off" />
-          <button type="submit">Search</button>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span>LightSearch</span>
+        </div>
+        <nav class="nav" aria-label="Navigation">
+          <div class="chip active">All</div>
+          <div class="chip">News</div>
+          <div class="chip">Docs</div>
+          <div class="chip">Community</div>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <h1 class="title">Search the web</h1>
+        <p class="subtitle">Fast, local, and built to prioritize trustworthy results with built-in scam and phishing protection.</p>
+
+        <form id="search-form" class="search-panel">
+          <div class="search-row">
+            <input id="query" type="text" placeholder="Search anything..." autocomplete="off" />
+            <button type="submit">Search</button>
+          </div>
+          <div class="search-meta">
+            <div class="meta-left">
+              <span class="dot"></span>
+              <span>Protected indexing</span>
+            </div>
+            <div>Organic + trusted content</div>
+          </div>
         </form>
-      </div>
-      <div id="results" class="results"></div>
+      </section>
+
+      <main id="results" class="results" aria-live="polite"></main>
     </div>
 
     <script>
       const form = document.getElementById('search-form');
       const input = document.getElementById('query');
       const resultsEl = document.getElementById('results');
+
+      function renderResults(data) {
+        if (!data.length) {
+          resultsEl.innerHTML = '<div class="empty">No trusted results found for this query.</div>';
+          return;
+        }
+
+        resultsEl.innerHTML = data.map((result) => {
+          const badge = result.safety_warning ? '<span class="badge warning">Warning</span>' : '<span class="badge safe">Safe</span>';
+          return `
+            <article class="result">
+              <div class="result-head">
+                <div>
+                  <a href="${result.url}" target="_blank" rel="noopener noreferrer">${result.title}</a>
+                  <div class="site">${result.url}</div>
+                </div>
+                ${badge}
+              </div>
+              <div class="snippet">${result.snippet || 'No snippet available.'}</div>
+              ${result.safety_warning ? `<div class="warning">Safety warning: ${result.safety_warning}</div>` : ''}
+            </article>
+          `;
+        }).join('');
+      }
 
       async function runSearch() {
         const q = input.value.trim();
@@ -138,22 +365,15 @@ const INDEX_HTML: &str = r#"
           return;
         }
 
-        resultsEl.innerHTML = '<div class="empty">Searching...</div>';
-        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-        const data = await res.json();
+        resultsEl.innerHTML = '<div class="loading">Searching trusted sources...</div>';
 
-        if (!data.length) {
-          resultsEl.innerHTML = '<div class="empty">No results found.</div>';
-          return;
+        try {
+          const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+          const data = await res.json();
+          renderResults(data);
+        } catch (error) {
+          resultsEl.innerHTML = '<div class="empty">The search service is unavailable. Index a few pages first.</div>';
         }
-
-        resultsEl.innerHTML = data.map(result => `
-          <div class="result">
-            <a href="${result.url}" target="_blank" rel="noopener noreferrer">${result.title}</a>
-            <div class="url">${result.url}</div>
-            <div class="snippet">${result.snippet}</div>
-          </div>
-        `).join('');
       }
 
       form.addEventListener('submit', (event) => {
@@ -175,13 +395,17 @@ async fn home() -> Html<&'static str> {
 }
 
 async fn search_api(Query(params): Query<SearchRequest>) -> impl IntoResponse {
-    let index = search::SearchIndex::open("search.db").unwrap_or_else(|_| {
-        println!("No index found. Run `cargo run -- index` first.");
-        search::SearchIndex::open("search.db").unwrap()
-    });
+    let index = match search::SearchIndex::open("search.db") {
+        Ok(index) => index,
+        Err(_) => {
+            return Json(Vec::<search::SearchResult>::new());
+        }
+    };
 
-    let results = index.search(&params.q, 10).unwrap_or_default();
-    Json(results)
+    match index.search(&params.q, 10) {
+        Ok(results) => Json(results),
+        Err(_) => Json(Vec::<search::SearchResult>::new()),
+    }
 }
 
 #[tokio::main]
@@ -242,4 +466,3 @@ mod tests {
         assert!(true);
     }
 }
-
